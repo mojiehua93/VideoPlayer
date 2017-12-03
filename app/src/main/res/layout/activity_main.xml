@@ -5,6 +5,7 @@
     android:layout_height="match_parent">
 
     <RelativeLayout
+        android:id="@+id/video_layout"
         android:layout_width="match_parent"
         android:layout_height="240dp">
 
@@ -90,11 +91,14 @@
 
                     <ImageView
                         android:visibility="gone"
+                        android:id="@+id/volume_image"
                         android:src="@drawable/jc_volume_icon"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
+                        android:layout_height="wrap_content"
+                        android:layout_marginLeft="8dp"/>
                     
                     <SeekBar
+                        android:visibility="gone"
                         android:id="@+id/volume_seekbar"
                         android:indeterminate="false"
                         android:thumb="@null"
@@ -105,19 +109,20 @@
 
                     <View
                         android:background="#1E1E1E"
-                        android:layout_marginLeft="32dp"
+                        android:layout_marginLeft="16dp"
                         android:layout_marginBottom="5dp"
                         android:layout_marginTop="5dp"
                         android:layout_width="1dp"
                         android:layout_height="match_parent"></View>
 
                     <ImageView
-                        android:src="@drawable/jc_shrink"
-                        android:layout_marginRight="16dp"
-                        android:layout_marginLeft="16dp"
+                        android:src="@drawable/jc_enlarge"
+                        android:paddingLeft="16dp"
+                        android:paddingRight="16dp"
                         android:id="@+id/screen_change"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"/>
+                        android:scaleType="center"
+                        android:layout_height="match_parent"/>
                 </LinearLayout>
             </RelativeLayout>
         </LinearLayout>
