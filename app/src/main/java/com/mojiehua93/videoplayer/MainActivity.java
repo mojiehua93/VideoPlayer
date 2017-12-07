@@ -12,8 +12,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.MediaController;
@@ -49,6 +51,9 @@ public class MainActivity extends AppCompatActivity {
     private DisplayMetrics mMetrics;
     private AudioManager mAudioManager;
     private boolean mIsFullScreen;
+    private int mStreamMaxVolume;
+    private int mStreamVolume;
+    private float mBrightness;
 
     private Handler mHandler = new Handler() {
         @Override
@@ -57,8 +62,8 @@ public class MainActivity extends AppCompatActivity {
             if (msg.what == UPDATE_PROGRESS_MESSAGE) {
                 int currentPosition = mVideoView.getCurrentPosition();
                 int totalPosition = mVideoView.getDuration();
-                Log.d(TAG, "handleMessage: currentPosition = " + currentPosition);
-                Log.d(TAG, "handleMessage: totalPosition = " + totalPosition);
+//                Log.d(TAG, "handleMessage: currentPosition = " + currentPosition);
+//                Log.d(TAG, "handleMessage: totalPosition = " + totalPosition);
 
                 updateProgressTime(mCurrentTimeView, currentPosition);
                 updateProgressTime(mTotalTimeView, totalPosition);
@@ -162,6 +167,32 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+        mVideoView.setOnTouchListener(new VideoViewOnTouchListener(this, mScreenWidth));
+    }
+
+    public void changeVolume(float deltaY) {
+        Log.d(TAG, "changeVolume: deltaY = " +deltaY);
+        mStreamVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+
+        int index = (int)(deltaY / mScreenHeight * mStreamMaxVolume * 3);
+        int changedVolume = Math.max(mStreamVolume + index, 0);
+        mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, changedVolume, 0);
+        mVolumeSeekBar.setProgress(changedVolume);
+    }
+
+    public void changeBrightness(float deltaY) {
+        WindowManager.LayoutParams attributes = getWindow().getAttributes();
+        mBrightness = attributes.screenBrightness;
+        float index = (deltaY / mScreenHeight / 3);
+        mBrightness += index;
+        if (mBrightness > 1.0F) {
+            mBrightness = 1.0F;
+        }
+        if (mBrightness < 0.01F) {
+            mBrightness = 0.01F;
+        }
+        attributes.screenBrightness = mBrightness;
+        getWindow().setAttributes(attributes);
     }
 
     private void updateProgressTime(TextView textView, int millisecond) {
@@ -218,10 +249,10 @@ public class MainActivity extends AppCompatActivity {
         mMetrics = getResources().getDisplayMetrics();
         mScreenWidth = mMetrics.widthPixels;
         mScreenHeight = mMetrics.heightPixels;
-        int streamMaxVolume = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
-        int streamVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
-        mVolumeSeekBar.setMax(streamMaxVolume);
-        mVolumeSeekBar.setProgress(streamVolume);
+        mStreamMaxVolume = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+        mStreamVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
+        mVolumeSeekBar.setMax(mStreamMaxVolume);
+        mVolumeSeekBar.setProgress(mStreamVolume);
     }
 
     @Override
@@ -237,12 +268,16 @@ public class MainActivity extends AppCompatActivity {
             mVolumeSeekBar.setVisibility(View.VISIBLE);
             mIsFullScreen = true;
             mScreenChangeView.setImageResource(R.drawable.jc_shrink);
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
         } else {
             setVideoViewScale(ViewGroup.LayoutParams.MATCH_PARENT, PixelUtils.dp2px(PORTRAIT_SCREEN_WIDTH));
             mVolumeView.setVisibility(View.INVISIBLE);
             mVolumeSeekBar.setVisibility(View.INVISIBLE);
             mIsFullScreen = false;
             mScreenChangeView.setImageResource(R.drawable.jc_enlarge);
+            getWindow().clearFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            getWindow().addFlags(WindowManager.LayoutParams.FLAG_FORCE_NOT_FULLSCREEN);
         }
     }
 
