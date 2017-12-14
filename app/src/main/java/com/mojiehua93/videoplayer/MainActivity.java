@@ -185,11 +185,12 @@ public class MainActivity extends AppCompatActivity {
 
         int index = (int)(deltaY / mScreenHeight * mStreamMaxVolume * 3);
         int changedVolume = Math.max(mStreamVolume + index, 0);
-        mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, changedVolume, 0);
-        mVolumeSeekBar.setProgress(changedVolume);
+        mTouchProgressBar.setMax(mStreamMaxVolume);
         mProgressBackgroud.setImageResource(R.drawable.jc_volume_icon);
         setTouchProgressLayoutVisibility(View.VISIBLE);
         mTouchProgressBar.setProgress(changedVolume);
+        mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, changedVolume, 0);
+        mVolumeSeekBar.setProgress(changedVolume);
     }
 
     public void changeBrightness(float deltaY) {
@@ -203,11 +204,12 @@ public class MainActivity extends AppCompatActivity {
         if (mBrightness < 0.01F) {
             mBrightness = 0.01F;
         }
+        mTouchProgressBar.setMax(100);
         attributes.screenBrightness = mBrightness;
         getWindow().setAttributes(attributes);
         mProgressBackgroud.setImageResource(R.drawable.jc_brightness_video);
         setTouchProgressLayoutVisibility(View.VISIBLE);
-        mTouchProgressBar.setProgress((int) mBrightness);
+        mTouchProgressBar.setProgress((int) (mBrightness * 100));
     }
 
     private void updateProgressTime(TextView textView, int millisecond) {
