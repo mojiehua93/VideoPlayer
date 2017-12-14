@@ -14,6 +14,8 @@
             android:layout_width="match_parent"
             android:layout_height="240dp"/>
 
+        <include layout="@layout/layout_touch_progress"/>
+
         <LinearLayout
             android:id="@+id/controller_bar"
             android:layout_width="match_parent"

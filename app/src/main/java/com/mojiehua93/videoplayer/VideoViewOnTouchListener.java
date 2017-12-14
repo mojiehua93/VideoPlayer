@@ -90,6 +90,7 @@ public class VideoViewOnTouchListener implements View.OnTouchListener {
             }
 
             case MotionEvent.ACTION_UP:
+                mMainActivity.setTouchProgressLayoutVisibility(View.INVISIBLE);
                 break;
         }
 

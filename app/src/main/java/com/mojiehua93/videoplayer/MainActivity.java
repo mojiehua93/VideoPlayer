@@ -16,9 +16,11 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.MediaController;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -54,6 +56,9 @@ public class MainActivity extends AppCompatActivity {
     private int mStreamMaxVolume;
     private int mStreamVolume;
     private float mBrightness;
+    private FrameLayout mTouchProgressLayout;
+    private ImageView mProgressBackgroud;
+    private ProgressBar mTouchProgressBar;
 
     private Handler mHandler = new Handler() {
         @Override
@@ -170,6 +175,10 @@ public class MainActivity extends AppCompatActivity {
         mVideoView.setOnTouchListener(new VideoViewOnTouchListener(this, mScreenWidth));
     }
 
+    public void setTouchProgressLayoutVisibility(int visibility) {
+        mTouchProgressLayout.setVisibility(visibility);
+    }
+
     public void changeVolume(float deltaY) {
         Log.d(TAG, "changeVolume: deltaY = " +deltaY);
         mStreamVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
@@ -178,6 +187,9 @@ public class MainActivity extends AppCompatActivity {
         int changedVolume = Math.max(mStreamVolume + index, 0);
         mAudioManager.setStreamVolume(AudioManager.STREAM_MUSIC, changedVolume, 0);
         mVolumeSeekBar.setProgress(changedVolume);
+        mProgressBackgroud.setImageResource(R.drawable.jc_volume_icon);
+        setTouchProgressLayoutVisibility(View.VISIBLE);
+        mTouchProgressBar.setProgress(changedVolume);
     }
 
     public void changeBrightness(float deltaY) {
@@ -193,6 +205,9 @@ public class MainActivity extends AppCompatActivity {
         }
         attributes.screenBrightness = mBrightness;
         getWindow().setAttributes(attributes);
+        mProgressBackgroud.setImageResource(R.drawable.jc_brightness_video);
+        setTouchProgressLayoutVisibility(View.VISIBLE);
+        mTouchProgressBar.setProgress((int) mBrightness);
     }
 
     private void updateProgressTime(TextView textView, int millisecond) {
@@ -246,6 +261,9 @@ public class MainActivity extends AppCompatActivity {
         mProgressSeekBar = findViewById(R.id.progress_bar);
         mVolumeView = findViewById(R.id.volume_image);
         mVolumeSeekBar = findViewById(R.id.volume_seekbar);
+        mTouchProgressLayout = findViewById(R.id.layout_touch_progress);
+        mProgressBackgroud = findViewById(R.id.progress_background);
+        mTouchProgressBar = findViewById(R.id.touch_progress_bar);
         mMetrics = getResources().getDisplayMetrics();
         mScreenWidth = mMetrics.widthPixels;
         mScreenHeight = mMetrics.heightPixels;
@@ -253,6 +271,8 @@ public class MainActivity extends AppCompatActivity {
         mStreamVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
         mVolumeSeekBar.setMax(mStreamMaxVolume);
         mVolumeSeekBar.setProgress(mStreamVolume);
+        mTouchProgressBar.setMax(mStreamMaxVolume);
+        mTouchProgressBar.setProgress(mStreamVolume);
     }
 
     @Override
